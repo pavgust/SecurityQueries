@@ -10,34 +10,7 @@ import java
 import lib.struts.DataFlow
 import lib.struts.OGNL
 import lib.struts.Sanitizers
-import lib.dataflow_extra.ExtraEdges
 import DataFlow::PathGraph
-import semmle.code.java.dataflow.TaintTracking
-
-
-class MappingCfg extends DataFlow::Configuration {
-  MappingCfg() {
-    this = "cve 2018-11776"
-  }
-  
-  override predicate isSource(DataFlow::Node source) {
-    isRemoteUserInputSource(source)
-  }
-  
-  override predicate isSink(DataFlow::Node sink) {
-    isOgnlSink(sink)
-  }
-  
-  override predicate isAdditionalFlowStep(DataFlow::Node node1, DataFlow::Node node2) {
-    TaintTracking::localTaintStep(node1, node2) or
-    isTaintedFieldStep(node1, node2)
-  }
-  
-  override predicate isBarrier(DataFlow::Node node) {
-    node instanceof MapMethodSanitizer or
-    node instanceof ToStringSanitizer
-  }
-}
 
 from MappingCfg cfg, DataFlow::PathNode source, DataFlow::PathNode sink
 where cfg.hasFlowPath(source, sink)
